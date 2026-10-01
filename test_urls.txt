@@ -1,0 +1,70 @@
+# SEO Performance Monitoring System - Test URLs
+# Run with: python3.14 -c "
+# from app import create_app
+# app = create_app()
+# with app.test_client() as c:
+#     for url in open('test_urls.txt').read().splitlines():
+#         if url and not url.startswith('#'):
+#             r = c.post('/analyze', data={'url': url.strip(), 'max_pages': '3'}, follow_redirects=False)
+#             print(f'{url.strip():50s} -> {r.headers.get(\"Location\", \"failed\")}')
+# "
+
+# ============================================
+# RECOMMENDED - Work reliably, score 70-90%
+# ============================================
+
+# Documentation sites (excellent SEO, no protection)
+https://docs.python.org/3/
+https://fastapi.tiangolo.com/
+https://docs.djangoproject.com/
+https://developer.mozilla.org/en-US/
+https://nodejs.org/en/docs/
+
+# Content/Blog sites (good SEO structure)
+https://blog.hubspot.com/
+https://moz.com/blog
+https://backlinko.com/
+https://ahrefs.com/blog
+
+# Technical/Corporate sites (well-optimized)
+https://www.python.org
+https://www.rust-lang.org
+https://golang.org
+https://www.typescriptlang.org
+https://kubernetes.io
+
+# ============================================
+# TEST SANDBOXES - Built for scraping practice
+# ============================================
+
+https://books.toscrape.com
+https://quotes.toscrape.com
+https://httpbin.org
+https://example.com
+
+# ============================================
+# E-COMMERCE (Product pages sometimes work)
+# ============================================
+
+https://www.ebay.com
+https://books.toscrape.com/catalogue/category/books_1/index.html
+
+# ============================================
+# NEWS/MEDIA (Good SEO, usually accessible)
+# ============================================
+
+https://www.bbc.com
+https://www.reuters.com
+https://apnews.com
+
+# ============================================
+# AVOID - Heavy bot protection / SPA / Auth
+# ============================================
+# https://www.amazon.com          - AWS WAF challenge
+# https://www.google.com          - Minimal page, bot detection
+# https://www.instagram.com       - JS SPA, empty HTML
+# https://www.facebook.com        - Auth wall
+# https://twitter.com             - Heavy JS, auth
+# https://www.linkedin.com        - Auth wall
+# https://www.youtube.com         - SPA, dynamic
+# https://www.reddit.com          - SPA, API-driven

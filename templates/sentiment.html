@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+
+{% block title %}Sentiment Analysis - SEO Monitor{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1">Sentiment Analysis</h1>
+        <p class="text-muted mb-0">Analyze sentiment of comments, reviews, or feedback</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-6 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0">Analyze Text</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('sentiment') }}">
+                    <div class="mb-3">
+                        <label for="text" class="form-label fw-semibold">Enter text to analyze</label>
+                        <textarea class="form-control" id="text" name="text" rows="5" placeholder="Enter a comment, review, or feedback...">{{ text or '' }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-magic me-1"></i>Analyze Sentiment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-3">
+        {% if result %}
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0">Result</h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="display-1 fw-bold text-{{ 'success' if result.sentiment == 'positive' else 'danger' if result.sentiment == 'negative' else 'warning' }}">
+                    <i class="bi bi-{{ 'emoji-smile' if result.sentiment == 'positive' else 'emoji-frown' if result.sentiment == 'negative' else 'emoji-neutral' }}"></i>
+                </div>
+                <h2 class="mt-3 text-capitalize">{{ result.sentiment }}</h2>
+                <div class="text-muted">Confidence Score: {{ result.score }}</div>
+                
+                <div class="row mt-4">
+                    <div class="col-4">
+                        <div class="small text-muted">Positive</div>
+                        <div class="fw-bold text-success">{{ "%.0f"|format((result.scores.pos or 0) * 100) }}%</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="small text-muted">Neutral</div>
+                        <div class="fw-bold text-secondary">{{ "%.0f"|format((result.scores.neu or 0) * 100) }}%</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="small text-muted">Negative</div>
+                        <div class="fw-bold text-danger">{{ "%.0f"|format((result.scores.neg or 0) * 100) }}%</div>
+                    </div>
+                </div>
+                
+                <div class="progress mt-3" style="height: 8px;">
+                    <div class="bg-success" style="width: {{ (result.scores.pos or 0) * 100 }}%"></div>
+                    <div class="bg-secondary" style="width: {{ (result.scores.neu or 0) * 100 }}%"></div>
+                    <div class="bg-danger" style="width: {{ (result.scores.neg or 0) * 100 }}%"></div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-4 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0">Overall Statistics</h5>
+            </div>
+            <div class="card-body">
+                {% if history %}
+                <div class="text-center mb-3">
+                    <div class="display-4 fw-bold text-primary">{{ history|length }}</div>
+                    <div class="text-muted">Total Analyses</div>
+                </div>
+                <div class="row text-center">
+                    <div class="col-4 mb-2">
+                        <div class="display-6 fw-bold text-success">{{ "%.1f"|format((history|selectattr('sentiment', 'equalto', 'positive')|list|length / history|length * 100) if history|length > 0 else 0) }}%</div>
+                        <small class="text-muted">Positive</small>
+                    </div>
+                    <div class="col-4 mb-2">
+                        <div class="display-6 fw-bold text-secondary">{{ "%.1f"|format((history|selectattr('sentiment', 'equalto', 'neutral')|list|length / history|length * 100) if history|length > 0 else 0) }}%</div>
+                        <small class="text-muted">Neutral</small>
+                    </div>
+                    <div class="col-4 mb-2">
+                        <div class="display-6 fw-bold text-danger">{{ "%.1f"|format((history|selectattr('sentiment', 'equalto', 'negative')|list|length / history|length * 100) if history|length > 0 else 0) }}%</div>
+                        <small class="text-muted">Negative</small>
+                    </div>
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-3">No analysis history yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0">Sentiment Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="sentimentChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Analysis History</h5>
+                <span class="badge bg-primary">{{ history|length }} records</span>
+            </div>
+            <div class="card-body p-0">
+                {% if history %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Text Preview</th>
+                                <th>Sentiment</th>
+                                <th>Score</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in history %}
+                            <tr>
+                                <td>{{ item.created_at }}</td>
+                                <td class="text-truncate" style="max-width: 400px;">{{ item.text[:150] }}{{ '...' if item.text|length > 150 else '' }}</td>
+                                <td><span class="badge bg-{{ 'success' if item.sentiment == 'positive' else 'danger' if item.sentiment == 'negative' else 'warning' }}">{{ item.sentiment.capitalize() }}</span></td>
+                                <td>{{ item.score }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="showDetails({{ item.text|tojson }}, {{ item.sentiment|tojson }}, {{ item.score }}, {{ item.scores|tojson }})">Details</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-chat-heart display-1 text-muted"></i>
+                    <h4 class="mt-3 text-muted">No sentiment analyses yet</h4>
+                    <p class="text-muted">Analyze your first text above to get started.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Sentiment Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if history %}
+    const pos = {{ history|selectattr('sentiment', 'equalto', 'positive')|list|length }};
+    const neu = {{ history|selectattr('sentiment', 'equalto', 'neutral')|list|length }};
+    const neg = {{ history|selectattr('sentiment', 'equalto', 'negative')|list|length }};
+    
+    new Chart(document.getElementById('sentimentChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Positive', 'Neutral', 'Negative'],
+            datasets: [{
+                data: [pos, neu, neg],
+                backgroundColor: ['#198754', '#6c757d', '#dc3545'],
+                borderWidth: 0
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '60%' }
+    });
+    {% endif %}
+});
+
+function showDetails(text, sentiment, score, scores) {
+    const modalBody = document.getElementById('modalBody');
+    modalBody.innerHTML = `
+        <p><strong>Text:</strong> ${text}</p>
+        <p><strong>Sentiment:</strong> <span class="badge bg-${sentiment === 'positive' ? 'success' : sentiment === 'negative' ? 'danger' : 'warning'}">${sentiment}</span></p>
+        <p><strong>Compound Score:</strong> ${score}</p>
+        <p><strong>Breakdown:</strong></p>
+        <ul>
+            <li>Positive: ${(scores.pos * 100).toFixed(1)}%</li>
+            <li>Neutral: ${(scores.neu * 100).toFixed(1)}%</li>
+            <li>Negative: ${(scores.neg * 100).toFixed(1)}%</li>
+        </ul>
+    `;
+    new bootstrap.Modal(document.getElementById('detailModal')).show();
+}
+</script>
+{% endblock %}

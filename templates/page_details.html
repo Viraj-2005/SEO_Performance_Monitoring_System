@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Page Details - {{ page.url }} - SEO Monitor{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1">Page SEO Details</h1>
+        <p class="text-muted mb-0"><a href="{{ url_for('dashboard', scan_id=page.scan_id) }}" class="text-decoration-none">&larr; Back to Dashboard</a></p>
+    </div>
+    <span class="badge bg-{{ 'success' if page.page_score >= 80 else 'warning' if page.page_score >= 60 else 'danger' }} fs-6">Score: {{ page.page_score }}</span>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0">Page Information</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <tr><th style="width: 30%;">URL</th><td><a href="{{ page.url }}" target="_blank" class="text-truncate d-block" style="max-width: 400px;">{{ page.url }}</a></td></tr>
+                    <tr><th>Status Code</th><td><span class="badge bg-{{ 'success' if page.status_code == 200 else 'warning' if page.status_code >= 300 and page.status_code < 400 else 'danger' }}">{{ page.status_code }}</span></td></tr>
+                    <tr><th>Title</th><td>{{ page.title or '<span class="text-danger">Missing</span>'|safe }}</td></tr>
+                    <tr><th>Meta Description</th><td>{{ page.meta_description or '<span class="text-danger">Missing</span>'|safe }}</td></tr>
+                    <tr><th>H1 Count</th><td>{{ page.h1_count }}</td></tr>
+                    <tr><th>H2 Count</th><td>{{ page.h2_count }}</td></tr>
+                    <tr><th>Word Count</th><td>{{ page.word_count }}</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0">Images & Links</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <tr><th style="width: 30%;">Total Images</th><td>{{ page.image_count }}</td></tr>
+                    <tr><th>Missing ALT</th><td><span class="badge bg-{{ 'danger' if page.missing_alt_count > 0 else 'success' }}">{{ page.missing_alt_count }}</span></td></tr>
+                    <tr><th>Internal Links</th><td>{{ page.internal_links }}</td></tr>
+                    <tr><th>External Links</th><td>{{ page.external_links }}</td></tr>
+                    <tr><th>Broken Links</th><td><span class="badge bg-{{ 'danger' if page.broken_links > 0 else 'success' }}">{{ page.broken_links }}</span></td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0">Technical SEO</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <tr><th style="width: 30%;">HTTPS</th><td><span class="badge bg-{{ 'success' if page.has_https else 'danger' }}">{{ 'Yes' if page.has_https else 'No' }}</span></td></tr>
+                    <tr><th>Canonical Tag</th><td><span class="badge bg-{{ 'success' if page.has_canonical else 'warning' }}">{{ 'Yes' if page.has_canonical else 'No' }}</span></td></tr>
+                    <tr><th>Viewport Meta</th><td><span class="badge bg-{{ 'success' if page.has_viewport else 'warning' }}">{{ 'Yes' if page.has_viewport else 'No' }}</span></td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0">Category Scores</h5>
+            </div>
+            <div class="card-body">
+                {% if page.category_scores %}
+                <div class="row text-center">
+                    <div class="col-4 mb-2">
+                        <div class="display-6 fw-bold text-primary">{{ "%.0f"|format(page.category_scores.technical) }}%</div>
+                        <small class="text-muted">Technical</small>
+                    </div>
+                    <div class="col-4 mb-2">
+                        <div class="display-6 fw-bold text-info">{{ "%.0f"|format(page.category_scores.onpage) }}%</div>
+                        <small class="text-muted">On-Page</small>
+                    </div>
+                    <div class="col-4 mb-2">
+                        <div class="display-6 fw-bold text-success">{{ "%.0f"|format(page.category_scores.content) }}%</div>
+                        <small class="text-muted">Content</small>
+                    </div>
+                </div>
+                {% else %}
+                <p class="text-muted">No category scores available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Issues Found</h5>
+                <span class="badge bg-primary">{{ page.issues|length }} total</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Severity</th>
+                                <th>Category</th>
+                                <th>Issue</th>
+                                <th>Description</th>
+                                <th>Recommendation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for issue in page.issues|sort(attribute='severity', reverse=true) %}
+                            <tr>
+                                <td><span class="badge bg-{{ 'danger' if issue.severity == 'critical' else 'warning' if issue.severity == 'warning' else 'success' }}">{{ issue.severity.capitalize() }}</span></td>
+                                <td><span class="badge bg-secondary">{{ issue.category.capitalize() }}</span></td>
+                                <td class="fw-semibold">{{ issue.title }}</td>
+                                <td>{{ issue.description }}</td>
+                                <td>{{ issue.recommendation }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
