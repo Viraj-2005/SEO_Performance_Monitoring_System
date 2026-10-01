@@ -53,7 +53,37 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}?v=20241219"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}?v={{ config.VERSION if config.VERSION else '20241220' }}"></script>
+    
+    <!-- Fallback: Ensure global functions are available immediately -->
+    <script>
+        // Fallback showDetails in case main.js hasn't loaded yet
+        window.showDetails = window.showDetails || function(text, sentiment, score, scores) {
+            console.warn('showDetails called before main.js loaded');
+            alert('Please wait for the page to fully load, then try again.');
+        };
+        
+        // Fallback theme toggle
+        (function() {
+            const btn = document.getElementById('themeToggle');
+            if (btn && !btn.dataset.listenerAdded) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const html = document.documentElement;
+                    const current = html.getAttribute('data-bs-theme');
+                    const next = current === 'dark' ? 'light' : 'dark';
+                    html.setAttribute('data-bs-theme', next);
+                    localStorage.setItem('theme', next);
+                    const icon = document.getElementById('themeIcon');
+                    if (icon) {
+                        icon.className = next === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
+                    }
+                });
+                btn.dataset.listenerAdded = 'true';
+            }
+        })();
+    </script>
+    
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>

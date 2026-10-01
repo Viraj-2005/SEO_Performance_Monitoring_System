@@ -8,6 +8,8 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///seo_monitor.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
+    VERSION = '20241220v3'
+    
     CRAWLER_MAX_PAGES = 10
     CRAWLER_TIMEOUT = 10
     CRAWLER_MAX_DEPTH = 3
