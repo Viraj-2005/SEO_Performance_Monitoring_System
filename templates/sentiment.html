@@ -172,7 +172,7 @@
                                 <td><span class="badge bg-{{ 'success' if item.sentiment == 'positive' else 'danger' if item.sentiment == 'negative' else 'warning' }} px-3 py-2">{{ item.sentiment.capitalize() }}</span></td>
                                 <td>{{ item.score }}</td>
                                 <td>
-                                    <button class="btn btn-sm btn-outline-primary" onclick="showDetails({{ item.text|tojson }}, {{ item.sentiment|tojson }}, {{ item.score }}, {{ item.scores|tojson }})">
+                                    <button class="btn btn-sm btn-outline-primary" onclick='showDetails({{ item.text|tojson }}, {{ item.sentiment|tojson }}, {{ item.score }}, {{ item.scores|tojson }})'>
                                         <i class="bi bi-eye me-1"></i>Details
                                     </button>
                                 </td>
