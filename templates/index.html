@@ -3,71 +3,129 @@
 {% block title %}SEO Performance Monitoring System - Home{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="text-center mb-5">
-            <h1 class="display-4 fw-bold text-primary mb-3">
-                <i class="bi bi-graph-up-arrow me-2"></i>SEO Performance Monitoring System
-            </h1>
-            <p class="lead text-muted">Analyze, monitor, and improve your website's SEO performance</p>
+<div class="hero-section animate-fade-in">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-3 fw-bold mb-3">
+                    <i class="bi bi-graph-up-arrow me-2"></i>SEO Performance Monitoring System
+                </h1>
+                <p class="lead mb-4 opacity-75">Analyze, monitor, and improve your website's SEO performance with automated crawling, intelligent scoring, and actionable insights.</p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="#analyzeForm" class="btn btn-light btn-lg px-4 fw-semibold">
+                        <i class="bi bi-search me-2"></i>Start Analysis
+                    </a>
+                    <a href="{{ url_for('history') }}" class="btn btn-outline-light btn-lg px-4 fw-semibold">
+                        <i class="bi bi-clock-history me-2"></i>View History
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 d-none d-lg-block text-center">
+                <div class="bg-white bg-opacity-10 backdrop-blur rounded-3 p-4 border border-white border-opacity-25">
+                    <div class="display-4 fw-bold text-white mb-1">250+</div>
+                    <div class="text-white-50 small">SEO Factors Analyzed</div>
+                </div>
+            </div>
         </div>
+    </div>
+</div>
 
-        <div class="card shadow-sm border-0">
-            <div class="card-body p-5">
-                <form method="POST" action="{{ url_for('analyze') }}" id="analyzeForm">
-                    <div class="mb-4">
+<div class="container">
+    <div class="row g-4 mb-5 stagger-1 animate-fade-in">
+        <div class="col-md-4">
+            <div class="feature-card h-100">
+                <div class="feature-icon primary"><i class="bi bi-spider"></i></div>
+                <h5 class="fw-semibold mb-2">Smart Crawler</h5>
+                <p class="text-muted mb-0">Crawls same-domain pages up to configurable depth, respects robots.txt, handles redirects, and extracts comprehensive SEO data.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card h-100">
+                <div class="feature-icon success"><i class="bi bi-graph-up"></i></div>
+                <h5 class="fw-semibold mb-2">Intelligent Scoring</h5>
+                <p class="text-muted mb-0">Weighted scoring across Technical (30%), On-Page (40%), and Content (30%) categories with 20+ individual factor checks.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card h-100">
+                <div class="feature-icon info"><i class="bi bi-lightbulb"></i></div>
+                <h5 class="fw-semibold mb-2">Actionable Insights</h5>
+                <p class="text-muted mb-0">Get prioritized recommendations with severity levels, impact descriptions, and specific fix actions for each issue.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card h-100">
+                <div class="feature-icon warning"><i class="bi bi-clock-history"></i></div>
+                <h5 class="fw-semibold mb-2">Historical Tracking</h5>
+                <p class="text-muted mb-0">Track SEO performance over time with trend charts, score comparisons, and improvement metrics across multiple scans.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card h-100">
+                <div class="feature-icon purple"><i class="bi bi-chat-heart"></i></div>
+                <h5 class="fw-semibold mb-2">Sentiment Analysis</h5>
+                <p class="text-muted mb-0">VADER-based sentiment analysis for reviews and comments with distribution charts and historical tracking.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card h-100">
+                <div class="feature-icon danger"><i class="bi bi-shield-check"></i></div>
+                <h5 class="fw-semibold mb-2">Ethical & Safe</h5>
+                <p class="text-muted mb-0">Respects robots.txt, rate limits, same-domain policy, and handles bot protections gracefully without bypassing.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm stagger-2 animate-fade-in" id="analyzeForm">
+        <div class="card-body p-4 p-md-5">
+            <div class="text-center mb-4">
+                <h2 class="h3 fw-bold mb-2">Analyze a Website</h2>
+                <p class="text-muted">Enter a URL to start a comprehensive SEO audit</p>
+            </div>
+            <form method="POST" action="{{ url_for('analyze') }}" data-loading>
+                <div class="row g-3 mb-4">
+                    <div class="col-12">
                         <label for="url" class="form-label fw-semibold">Website URL</label>
-                        <div class="input-group">
+                        <div class="input-group input-group-lg">
                             <span class="input-group-text"><i class="bi bi-globe"></i></span>
-                            <input type="url" class="form-control form-control-lg" id="url" name="url" 
-                                   placeholder="https://example.com" required autocomplete="url">
+                            <input type="url" class="form-control" id="url" name="url" 
+                                   placeholder="https://example.com" required autocomplete="url" autofocus>
                         </div>
-                        <div class="form-text">Enter the full URL including http:// or https://</div>
+                        <div class="form-text">Include http:// or https:// (auto-added if omitted)</div>
                     </div>
-
-                    <div class="mb-4">
+                    <div class="col-md-6">
                         <label for="max_pages" class="form-label fw-semibold">Maximum Pages to Crawl</label>
-                        <div class="input-group">
-                            <input type="number" class="form-control form-control-lg" id="max_pages" name="max_pages" 
+                        <div class="input-group input-group-lg">
+                            <input type="number" class="form-control" id="max_pages" name="max_pages" 
                                    value="10" min="1" max="50" required>
                             <span class="input-group-text">pages</span>
                         </div>
-                        <div class="form-text">Limit crawling to a specific number of pages (1-50)</div>
+                        <div class="form-text">Recommended: 10-20 for quick audit, up to 50 for deep analysis</div>
                     </div>
-
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                        <button type="submit" class="btn btn-primary btn-lg px-5" id="analyzeBtn">
-                            <i class="bi bi-search me-2"></i>Start SEO Analysis
-                        </button>
-                        <a href="{{ url_for('history') }}" class="btn btn-outline-secondary btn-lg px-5">
-                            <i class="bi bi-clock-history me-2"></i>View History
-                        </a>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">&nbsp;</label>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg fw-semibold">
+                                <i class="bi bi-search me-2"></i>Start SEO Analysis
+                            </button>
+                        </div>
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
+    </div>
 
-        <div class="row mt-5">
-            <div class="col-md-4 text-center">
-                <div class="p-3">
-                    <i class="bi bi-spider text-primary display-4"></i>
-                    <h5 class="mt-3">Smart Crawler</h5>
-                    <p class="text-muted">Crawls same-domain pages, extracts SEO data, respects limits</p>
-                </div>
-            </div>
-            <div class="col-md-4 text-center">
-                <div class="p-3">
-                    <i class="bi bi-graph-up text-success display-4"></i>
-                    <h5 class="mt-3">SEO Scoring</h5>
-                    <p class="text-muted">Technical, On-Page & Content scores with actionable insights</p>
-                </div>
-            </div>
-            <div class="col-md-4 text-center">
-                <div class="p-3">
-                    <i class="bi bi-chat-heart text-warning display-4"></i>
-                    <h5 class="mt-3">Sentiment Analysis</h5>
-                    <p class="text-muted">VADER-based sentiment analysis for reviews & comments</p>
-                </div>
+    <div class="row g-4 mt-5 stagger-3 animate-fade-in">
+        <div class="col-12">
+            <h3 class="h5 fw-semibold mb-3">Quick Test URLs</h3>
+            <p class="text-muted small mb-3">Click any URL to pre-fill the form (opens in new tab for reference)</p>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="#" class="btn btn-outline-secondary btn-sm" onclick="prefillUrl('https://docs.python.org/3/'); return false;">Python Docs</a>
+                <a href="#" class="btn btn-outline-secondary btn-sm" onclick="prefillUrl('https://fastapi.tiangolo.com/'); return false;">FastAPI Docs</a>
+                <a href="#" class="btn btn-outline-secondary btn-sm" onclick="prefillUrl('https://books.toscrape.com/'); return false;">Books to Scrape</a>
+                <a href="#" class="btn btn-outline-secondary btn-sm" onclick="prefillUrl('https://quotes.toscrape.com/'); return false;">Quotes to Scrape</a>
+                <a href="#" class="btn btn-outline-secondary btn-sm" onclick="prefillUrl('https://httpbin.org/'); return false;">HTTPBin</a>
+                <a href="#" class="btn btn-outline-secondary btn-sm" onclick="prefillUrl('https://example.com/'); return false;">Example.com</a>
             </div>
         </div>
     </div>
@@ -76,8 +134,14 @@
 
 {% block extra_scripts %}
 <script>
+function prefillUrl(url) {
+    document.getElementById('url').value = url;
+    document.getElementById('url').focus();
+    document.getElementById('analyzeForm').scrollIntoView({ behavior: 'smooth' });
+}
+
 document.getElementById('analyzeForm').addEventListener('submit', function(e) {
-    const btn = document.getElementById('analyzeBtn');
+    const btn = this.querySelector('button[type="submit"]');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Analyzing...';
 });

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,15 +11,18 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
         <div class="container">
             <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">
                 <i class="bi bi-graph-up-arrow me-2"></i>SEO Monitor
             </a>
-            <div class="navbar-nav ms-auto">
+            <div class="navbar-nav ms-auto align-items-center">
                 <a class="nav-link" href="{{ url_for('index') }}"><i class="bi bi-house me-1"></i>Home</a>
                 <a class="nav-link" href="{{ url_for('history') }}"><i class="bi bi-clock-history me-1"></i>History</a>
                 <a class="nav-link" href="{{ url_for('sentiment') }}"><i class="bi bi-chat-heart me-1"></i>Sentiment</a>
+                <button class="btn btn-outline-light btn-sm ms-2" id="themeToggle" title="Toggle theme" aria-label="Toggle dark/light mode">
+                    <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+                </button>
             </div>
         </div>
     </nav>
@@ -43,7 +46,7 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="bg-light py-3 mt-5">
+    <footer class="footer py-3 mt-5">
         <div class="container text-center text-muted small">
             SEO Performance Monitoring System &copy; 2024 - Academic Project
         </div>
