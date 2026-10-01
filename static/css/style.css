@@ -140,6 +140,9 @@ a:hover {
     padding: 0.5rem 0.75rem !important;
     border-radius: var(--radius);
     transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .nav-link:hover {
@@ -149,6 +152,15 @@ a:hover {
 
 .nav-link.active {
     background-color: rgba(255, 255, 255, 0.15);
+}
+
+.nav-link i {
+    font-size: 1.125rem;
+    transition: all var(--transition);
+}
+
+.nav-link:hover i {
+    transform: scale(1.2);
 }
 
 .btn {
@@ -471,13 +483,19 @@ a:hover {
 }
 
 .stats-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: var(--radius);
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 1.75rem;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition);
+}
+
+.stats-card:hover .stats-icon {
+    transform: scale(1.1);
 }
 
 .stats-icon.primary { background: var(--primary-light); color: var(--primary); }
@@ -515,24 +533,34 @@ a:hover {
 }
 
 #themeToggle {
-    width: 38px;
-    height: 38px;
+    width: 44px;
+    height: 44px;
     padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
     transition: all var(--transition);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 #themeToggle:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-    transform: rotate(15deg);
+    background-color: rgba(255, 255, 255, 0.25);
+    transform: rotate(15deg) scale(1.1);
 }
 
 #themeToggle:focus-visible {
     outline: 2px solid #fff;
     outline-offset: 2px;
+}
+
+#themeIcon {
+    font-size: 1.25rem;
+    transition: all var(--transition);
+}
+
+#themeToggle:hover #themeIcon {
+    transform: scale(1.2);
 }
 
 .hero-section {
@@ -577,14 +605,20 @@ a:hover {
 }
 
 .feature-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: var(--radius);
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     margin-bottom: 1rem;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition);
+}
+
+.feature-card:hover .feature-icon {
+    transform: scale(1.1);
 }
 
 .severity-critical { border-left: 4px solid var(--danger); }
@@ -653,3 +687,283 @@ a:hover {
 .stagger-4 { animation-delay: 0.2s; }
 .stagger-5 { animation-delay: 0.25s; }
 .stagger-6 { animation-delay: 0.3s; }
+
+/* ============================================
+   ICON VISIBILITY ENHANCEMENTS
+   ============================================ */
+
+/* General icon improvements */
+.bi {
+    vertical-align: middle;
+    line-height: 1;
+}
+
+/* Card header icons */
+.card-header i {
+    font-size: 1.125rem;
+    opacity: 0.9;
+}
+
+/* Table icons */
+.table i {
+    font-size: 1rem;
+    vertical-align: middle;
+}
+
+/* Button icons */
+.btn i {
+    font-size: 1rem;
+    transition: transform var(--transition);
+}
+
+.btn:hover i {
+    transform: scale(1.15);
+}
+
+/* Badge icons */
+.badge i {
+    font-size: 0.875rem;
+    vertical-align: middle;
+}
+
+/* Alert icons */
+.alert i {
+    font-size: 1rem;
+    margin-right: 0.5rem;
+}
+
+/* Form input group icons */
+.input-group-text i {
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+/* Hero section icon */
+.hero-section i {
+    opacity: 0.9;
+}
+
+/* Empty state icons */
+.empty-state i {
+    font-size: 5rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.6;
+    background: linear-gradient(135deg, var(--primary), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Modal icons */
+.modal-title i {
+    font-size: 1.25rem;
+    margin-right: 0.5rem;
+}
+
+/* Page header icons */
+.page-header i {
+    font-size: 1.25rem;
+}
+
+/* Breadcrumb icons */
+.breadcrumb-nav i {
+    font-size: 1rem;
+}
+
+/* Severity badge icons */
+.severity-critical i,
+.severity-warning i,
+.severity-passed i {
+    font-size: 0.875rem;
+}
+
+/* Chart container icon fallback */
+.chart-container::before {
+    content: '';
+}
+
+/* Stats icon glow effect */
+.stats-icon {
+    position: relative;
+}
+
+.stats-icon::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity var(--transition);
+    z-index: -1;
+}
+
+.stats-icon.primary::after {
+    background: var(--primary);
+    filter: blur(8px);
+}
+
+.stats-icon.success::after {
+    background: var(--success);
+    filter: blur(8px);
+}
+
+.stats-icon.warning::after {
+    background: var(--warning);
+    filter: blur(8px);
+}
+
+.stats-icon.danger::after {
+    background: var(--danger);
+    filter: blur(8px);
+}
+
+.stats-icon.info::after {
+    background: var(--info);
+    filter: blur(8px);
+}
+
+.stats-icon.purple::after {
+    background: var(--purple);
+    filter: blur(8px);
+}
+
+.stats-card:hover .stats-icon::after {
+    opacity: 0.3;
+}
+
+/* Feature icon glow effect */
+.feature-icon {
+    position: relative;
+}
+
+.feature-icon::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity var(--transition);
+    z-index: -1;
+}
+
+.feature-icon.primary::after { background: var(--primary); filter: blur(8px); }
+.feature-icon.success::after { background: var(--success); filter: blur(8px); }
+.feature-icon.warning::after { background: var(--warning); filter: blur(8px); }
+.feature-icon.danger::after { background: var(--danger); filter: blur(8px); }
+.feature-icon.info::after { background: var(--info); filter: blur(8px); }
+.feature-icon.purple::after { background: var(--purple); filter: blur(8px); }
+
+.feature-card:hover .feature-icon::after {
+    opacity: 0.3;
+}
+
+/* Navbar brand icon */
+.navbar-brand i {
+    font-size: 1.5rem;
+    transition: transform var(--transition);
+}
+
+.navbar-brand:hover i {
+    transform: rotate(15deg) scale(1.1);
+}
+
+/* Table action buttons */
+.table .btn i {
+    font-size: 0.875rem;
+}
+
+/* Pagination icons */
+.pagination i {
+    font-size: 0.875rem;
+}
+
+/* Dropdown icons */
+.dropdown-item i {
+    font-size: 1rem;
+    width: 1.25rem;
+    text-align: center;
+    margin-right: 0.5rem;
+}
+
+/* Tooltip icons */
+.tooltip .bi {
+    font-size: 0.875rem;
+}
+
+/* Progress bar icons */
+.progress .bi {
+    font-size: 0.75rem;
+}
+
+/* Icon color utility classes */
+.icon-primary { color: var(--primary) !important; }
+.icon-success { color: var(--success) !important; }
+.icon-warning { color: var(--warning) !important; }
+.icon-danger { color: var(--danger) !important; }
+.icon-info { color: var(--info) !important; }
+.icon-purple { color: var(--purple) !important; }
+.icon-muted { color: var(--text-muted) !important; }
+
+/* High contrast icons for better visibility */
+.icon-high-contrast {
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+[data-bs-theme="dark"] .icon-high-contrast {
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+/* Animation for icons on hover */
+.icon-pulse:hover {
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
+/* Icon spin animation for loading states */
+.icon-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive icon sizes */
+@media (max-width: 768px) {
+    .feature-icon {
+        width: 56px;
+        height: 56px;
+        font-size: 1.5rem;
+    }
+    
+    .stats-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 1.5rem;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+    }
+    
+    .navbar-brand i {
+        font-size: 1.25rem;
+    }
+    
+    .nav-link i {
+        font-size: 1rem;
+    }
+}
+
+/* Print styles for icons */
+@media print {
+    .bi {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}

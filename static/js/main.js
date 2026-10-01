@@ -2,6 +2,16 @@
 
 console.log('main.js loaded');
 
+// Prevent browser from restoring scroll position on reload
+if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+}
+
+// Scroll to top immediately on page load
+window.addEventListener('beforeunload', function() {
+    window.scrollTo(0, 0);
+});
+
 // Initialize theme immediately if DOM is ready, otherwise wait
 function initThemeNow() {
     console.log('initThemeNow called');
@@ -17,6 +27,9 @@ if (document.readyState === 'loading') {
 // Also handle case where script loads after DOMContentLoaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOMContentLoaded fired');
+
+    // Force scroll to top on page load
+    window.scrollTo(0, 0);
 
     // Auto-dismiss alerts after 5 seconds
     setTimeout(function() {
@@ -38,10 +51,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Smooth scroll for anchor links
+    // Smooth scroll for anchor links (only for same-page links, not on initial load)
     document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
         anchor.addEventListener('click', function(e) {
-            const target = document.querySelector(this.getAttribute('href'));
+            const href = this.getAttribute('href');
+            if (href === '#') return;
+            const target = document.querySelector(href);
             if (target) {
                 e.preventDefault();
                 target.scrollIntoView({ behavior: 'smooth' });
@@ -148,58 +163,78 @@ function updateChartsTheme(theme) {
 
 // Sentiment Analysis Modal
 function showDetails(text, sentiment, score, scores) {
-    console.log('showDetails called');
+    console.log('showDetails called with:', { text: text ? text.substring(0, 50) : 'empty', sentiment, score, scores });
+    
     const modalEl = document.getElementById('detailModal');
     const modalBody = document.getElementById('modalBody');
     
     if (!modalEl || !modalBody) {
-        console.error('Modal elements not found');
+        console.error('Modal elements not found', { modalEl: !!modalEl, modalBody: !!modalBody });
+        alert('Error: Modal elements not found. Please refresh the page.');
         return;
     }
+
+    // Ensure scores object has required keys
+    if (!scores || typeof scores !== 'object') {
+        console.error('Invalid scores object:', scores);
+        scores = { pos: 0, neu: 0, neg: 0, compound: 0 };
+    }
+    
+    // Default missing keys to 0
+    scores.pos = scores.pos || 0;
+    scores.neu = scores.neu || 0;
+    scores.neg = scores.neg || 0;
+    scores.compound = scores.compound || 0;
 
     const badgeClass = sentiment === 'positive' ? 'success' : sentiment === 'negative' ? 'danger' : 'warning';
     const icon = sentiment === 'positive' ? 'emoji-smile' : sentiment === 'negative' ? 'emoji-frown' : 'emoji-neutral';
     
-    modalBody.innerHTML = `
-        <div class="text-center mb-4">
-            <i class="bi bi-${icon} display-1 text-${badgeClass}"></i>
-            <h4 class="mt-2 text-capitalize">${sentiment}</h4>
-            <span class="badge bg-${badgeClass} fs-6">${sentiment}</span>
-        </div>
-        <p class="mb-3"><strong>Analyzed Text:</strong></p>
-        <div class="p-3 bg-secondary bg-opacity-25 rounded mb-4" style="white-space: pre-wrap; max-height: 200px; overflow-y: auto;">${text}</div>
-        <div class="row g-3 mb-3">
-            <div class="col-4">
-                <div class="stats-card p-3 text-center">
-                    <div class="text-muted small">Positive</div>
-                    <div class="fw-bold fs-5 text-success">${(scores.pos * 100).toFixed(1)}%</div>
+    try {
+        modalBody.innerHTML = `
+            <div class="text-center mb-4">
+                <i class="bi bi-${icon} display-1 text-${badgeClass}"></i>
+                <h4 class="mt-2 text-capitalize">${sentiment}</h4>
+                <span class="badge bg-${badgeClass} fs-6">${sentiment}</span>
+            </div>
+            <p class="mb-3"><strong>Analyzed Text:</strong></p>
+            <div class="p-3 bg-secondary bg-opacity-25 rounded mb-4" style="white-space: pre-wrap; max-height: 200px; overflow-y: auto;">${text}</div>
+            <div class="row g-3 mb-3">
+                <div class="col-4">
+                    <div class="stats-card p-3 text-center">
+                        <div class="text-muted small">Positive</div>
+                        <div class="fw-bold fs-5 text-success">${(scores.pos * 100).toFixed(1)}%</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="stats-card p-3 text-center">
+                        <div class="text-muted small">Neutral</div>
+                        <div class="fw-bold fs-5 text-secondary">${(scores.neu * 100).toFixed(1)}%</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="stats-card p-3 text-center">
+                        <div class="text-muted small">Negative</div>
+                        <div class="fw-bold fs-5 text-danger">${(scores.neg * 100).toFixed(1)}%</div>
+                    </div>
                 </div>
             </div>
-            <div class="col-4">
-                <div class="stats-card p-3 text-center">
-                    <div class="text-muted small">Neutral</div>
-                    <div class="fw-bold fs-5 text-secondary">${(scores.neu * 100).toFixed(1)}%</div>
-                </div>
+            <div class="progress" style="height: 8px;">
+                <div class="bg-success" style="width: ${(scores.pos * 100)}%"></div>
+                <div class="bg-secondary" style="width: ${(scores.neu * 100)}%"></div>
+                <div class="bg-danger" style="width: ${(scores.neg * 100)}%"></div>
             </div>
-            <div class="col-4">
-                <div class="stats-card p-3 text-center">
-                    <div class="text-muted small">Negative</div>
-                    <div class="fw-bold fs-5 text-danger">${(scores.neg * 100).toFixed(1)}%</div>
-                </div>
+            <div class="mt-3 small text-muted">
+                Compound Score: ${score}
             </div>
-        </div>
-        <div class="progress" style="height: 8px;">
-            <div class="bg-success" style="width: ${(scores.pos * 100)}%"></div>
-            <div class="bg-secondary" style="width: ${(scores.neu * 100)}%"></div>
-            <div class="bg-danger" style="width: ${(scores.neg * 100)}%"></div>
-        </div>
-        <div class="mt-3 small text-muted">
-            Compound Score: ${score}
-        </div>
-    `;
-    
-    const bsModal = new bootstrap.Modal(modalEl);
-    bsModal.show();
+        `;
+        
+        const bsModal = new bootstrap.Modal(modalEl);
+        bsModal.show();
+        console.log('Modal shown successfully');
+    } catch (error) {
+        console.error('Error showing modal:', error);
+        alert('Error showing details: ' + error.message);
+    }
 }
 
 // Utility functions
@@ -318,7 +353,7 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('keydown', function(e) {
     // Ctrl/Cmd + K for search focus (if search exists)
     if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        const searchInput = document.queryestor('input[type="search"], input[name="url"]');
+        const searchInput = document.querySelector('input[type="search"], input[name="url"]');
         if (searchInput) {
             e.preventDefault();
             searchInput.focus();
