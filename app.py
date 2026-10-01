@@ -80,6 +80,7 @@ def create_app(config_name=None):
     
     @app.route('/sentiment', methods=['GET', 'POST'])
     def sentiment():
+        from database.database import get_sentiment_history
         if request.method == 'POST':
             text = request.form.get('text', '').strip()
             if text:
@@ -87,8 +88,8 @@ def create_app(config_name=None):
                 from database.database import save_sentiment
                 result = analyze_sentiment(text)
                 save_sentiment(text, result)
-                return render_template('sentiment.html', result=result, text=text)
-        from database.database import get_sentiment_history
+                history = get_sentiment_history()
+                return render_template('sentiment.html', result=result, text=text, history=history)
         history = get_sentiment_history()
         return render_template('sentiment.html', history=history)
     
