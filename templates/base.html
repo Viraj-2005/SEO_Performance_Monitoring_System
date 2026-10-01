@@ -59,8 +59,8 @@
     <script>
         // Fallback showDetails in case main.js hasn't loaded yet
         window.showDetails = window.showDetails || function(text, sentiment, score, scores) {
-            console.warn('showDetails called before main.js loaded');
-            alert('Please wait for the page to fully load, then try again.');
+            console.log('FALLBACK showDetails called:', { text: text?.substring(0,50), sentiment, score, scores });
+            alert('Fallback showDetails called. Please wait for page to fully load, then try again.\n\nText: ' + (text?.substring(0, 100) || 'none') + '\nSentiment: ' + sentiment + '\nScore: ' + score);
         };
         
         // Fallback theme toggle
@@ -69,6 +69,7 @@
             if (btn && !btn.dataset.listenerAdded) {
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
+                    console.log('FALLBACK theme toggle clicked');
                     const html = document.documentElement;
                     const current = html.getAttribute('data-bs-theme');
                     const next = current === 'dark' ? 'light' : 'dark';
@@ -78,10 +79,19 @@
                     if (icon) {
                         icon.className = next === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
                     }
+                    console.log('Theme switched to:', next);
                 });
                 btn.dataset.listenerAdded = 'true';
+                console.log('Fallback theme toggle listener added');
             }
         })();
+        
+        // Debug: Log when functions are available
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOMContentLoaded - showDetails:', typeof window.showDetails);
+            console.log('DOMContentLoaded - modal element:', document.getElementById('detailModal'));
+            console.log('DOMContentLoaded - modalBody element:', document.getElementById('modalBody'));
+        });
     </script>
     
     {% block extra_scripts %}{% endblock %}
