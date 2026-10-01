@@ -62,12 +62,16 @@ function initTheme() {
     applyTheme(initialTheme);
 
     if (themeToggle) {
-        themeToggle.addEventListener('click', function() {
+        themeToggle.addEventListener('click', function(e) {
+            e.preventDefault();
             const currentTheme = html.getAttribute('data-bs-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             applyTheme(newTheme);
             localStorage.setItem('theme', newTheme);
         });
+        console.log('Theme toggle initialized');
+    } else {
+        console.warn('Theme toggle button not found');
     }
 
     // Listen for system theme changes
@@ -97,24 +101,81 @@ function updateChartsTheme(theme) {
     Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
     // Update existing charts
-    Chart.instances.forEach(function(chart) {
-        if (chart.options) {
-            chart.options.scales = chart.options.scales || {};
-            Object.keys(chart.options.scales).forEach(function(scaleKey) {
-                const scale = chart.options.scales[scaleKey];
-                if (scale) {
-                    scale.grid = scale.grid || {};
-                    scale.grid.color = gridColor;
-                    scale.ticks = scale.ticks || {};
-                    scale.ticks.color = textColor;
+    if (typeof Chart !== 'undefined' && Chart.instances) {
+        Chart.instances.forEach(function(chart) {
+            if (chart.options) {
+                chart.options.scales = chart.options.scales || {};
+                Object.keys(chart.options.scales).forEach(function(scaleKey) {
+                    const scale = chart.options.scales[scaleKey];
+                    if (scale) {
+                        scale.grid = scale.grid || {};
+                        scale.grid.color = gridColor;
+                        scale.ticks = scale.ticks || {};
+                        scale.ticks.color = textColor;
+                    }
+                });
+                if (chart.options.plugins && chart.options.plugins.legend) {
+                    chart.options.plugins.legend.labels.color = textColor;
                 }
-            });
-            if (chart.options.plugins && chart.options.plugins.legend) {
-                chart.options.plugins.legend.labels.color = textColor;
+                chart.update('none');
             }
-            chart.update('none');
-        }
-    });
+        });
+    }
+}
+
+// Sentiment Analysis Modal
+function showDetails(text, sentiment, score, scores) {
+    const modalEl = document.getElementById('detailModal');
+    const modalBody = document.getElementById('modalBody');
+    
+    if (!modalEl || !modalBody) {
+        console.error('Modal elements not found');
+        return;
+    }
+
+    const badgeClass = sentiment === 'positive' ? 'success' : sentiment === 'negative' ? 'danger' : 'warning';
+    const icon = sentiment === 'positive' ? 'emoji-smile' : sentiment === 'negative' ? 'emoji-frown' : 'emoji-neutral';
+    
+    modalBody.innerHTML = `
+        <div class="text-center mb-4">
+            <i class="bi bi-${icon} display-1 text-${badgeClass}"></i>
+            <h4 class="mt-2 text-capitalize">${sentiment}</h4>
+            <span class="badge bg-${badgeClass} fs-6">${sentiment}</span>
+        </div>
+        <p class="mb-3"><strong>Analyzed Text:</strong></p>
+        <div class="p-3 bg-secondary bg-opacity-25 rounded mb-4" style="white-space: pre-wrap; max-height: 200px; overflow-y: auto;">${text}</div>
+        <div class="row g-3 mb-3">
+            <div class="col-4">
+                <div class="stats-card p-3 text-center">
+                    <div class="text-muted small">Positive</div>
+                    <div class="fw-bold fs-5 text-success">${(scores.pos * 100).toFixed(1)}%</div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="stats-card p-3 text-center">
+                    <div class="text-muted small">Neutral</div>
+                    <div class="fw-bold fs-5 text-secondary">${(scores.neu * 100).toFixed(1)}%</div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="stats-card p-3 text-center">
+                    <div class="text-muted small">Negative</div>
+                    <div class="fw-bold fs-5 text-danger">${(scores.neg * 100).toFixed(1)}%</div>
+                </div>
+            </div>
+        </div>
+        <div class="progress" style="height: 8px;">
+            <div class="bg-success" style="width: ${(scores.pos * 100)}%"></div>
+            <div class="bg-secondary" style="width: ${(scores.neu * 100)}%"></div>
+            <div class="bg-danger" style="width: ${(scores.neg * 100)}%"></div>
+        </div>
+        <div class="mt-3 small text-muted">
+            Compound Score: ${score}
+        </div>
+    `;
+    
+    const bsModal = new bootstrap.Modal(modalEl);
+    bsModal.show();
 }
 
 // Utility functions
@@ -252,3 +313,4 @@ document.addEventListener('keydown', function(e) {
 
 // Export for global use
 window.SEOUtils = SEOUtils;
+window.showDetails = showDetails;
