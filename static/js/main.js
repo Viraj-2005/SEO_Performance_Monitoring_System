@@ -1,8 +1,22 @@
 // Common JavaScript utilities for SEO Monitor
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize theme
+console.log('main.js loaded');
+
+// Initialize theme immediately if DOM is ready, otherwise wait
+function initThemeNow() {
+    console.log('initThemeNow called');
     initTheme();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initThemeNow);
+} else {
+    initThemeNow();
+}
+
+// Also handle case where script loads after DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded fired');
 
     // Auto-dismiss alerts after 5 seconds
     setTimeout(function() {
@@ -50,29 +64,37 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Theme Management
 function initTheme() {
+    console.log('initTheme called');
     const themeToggle = document.getElementById('themeToggle');
     const themeIcon = document.getElementById('themeIcon');
     const html = document.documentElement;
+
+    console.log('themeToggle element:', themeToggle);
+    console.log('themeIcon element:', themeIcon);
+    console.log('html element:', html);
+
+    if (!themeToggle) {
+        console.warn('Theme toggle button not found in DOM');
+        return;
+    }
 
     // Get saved theme or system preference
     const savedTheme = localStorage.getItem('theme');
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const initialTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
 
+    console.log('Applying initial theme:', initialTheme);
     applyTheme(initialTheme);
 
-    if (themeToggle) {
-        themeToggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            const currentTheme = html.getAttribute('data-bs-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            applyTheme(newTheme);
-            localStorage.setItem('theme', newTheme);
-        });
-        console.log('Theme toggle initialized');
-    } else {
-        console.warn('Theme toggle button not found');
-    }
+    themeToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        console.log('Theme toggle clicked');
+        const currentTheme = html.getAttribute('data-bs-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        console.log('Switching theme:', currentTheme, '->', newTheme);
+        applyTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
+    });
 
     // Listen for system theme changes
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
@@ -82,6 +104,7 @@ function initTheme() {
     });
 
     function applyTheme(theme) {
+        console.log('Applying theme:', theme);
         html.setAttribute('data-bs-theme', theme);
         if (themeIcon) {
             themeIcon.className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
@@ -125,6 +148,7 @@ function updateChartsTheme(theme) {
 
 // Sentiment Analysis Modal
 function showDetails(text, sentiment, score, scores) {
+    console.log('showDetails called');
     const modalEl = document.getElementById('detailModal');
     const modalBody = document.getElementById('modalBody');
     
@@ -294,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('keydown', function(e) {
     // Ctrl/Cmd + K for search focus (if search exists)
     if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        const searchInput = document.querySelector('input[type="search"], input[name="url"]');
+        const searchInput = document.queryestor('input[type="search"], input[name="url"]');
         if (searchInput) {
             e.preventDefault();
             searchInput.focus();
